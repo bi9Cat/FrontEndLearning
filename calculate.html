@@ -9,12 +9,48 @@
 
 <body>
 	<div class="container">
-		<div>计算器</div>
+		<div style="margin: 10px; font-size: 10px; pointer-events: none;">计算器</div>
 		<div class="menu">
-			<button>一</button>
-			<p style="display: inline;">标准</p>
-			<button>二</button>
-			<button style="float: right;margin-right:10px;">三</button>
+			<button id="setnemu">
+				<img src="./images/icons8-菜单-50.png" alt="Icon" />
+			</button>
+			<p class="calctype">标准</p>
+			<button>
+				<img src="./images/icons8-最大化-50.png" />
+			</button>
+			<button style="float: right;margin-right:10px;">
+				<img src="./images/icons8-历史-48.png" />
+			</button>
+			<div id="menudv" class="v1 animation-slide-left">
+				<ul id="menuul">
+					<li class="grayfont">计算器
+						<ul>
+							<li class="backimagebiaozhun">标准</li>
+							<li class="backimagekexu">科学</li>
+							<li class="backimagehuitu">绘图</li>
+							<li class="backimagechengxuyuan">程序员</li>
+							<li class="backimageriqi">日期计算</li>
+						</ul>
+					</li>
+					<li class="grayfont">转换器
+						<ul>
+							<li>货币</li>
+							<li>容量</li>
+							<li>长度</li>
+							<li>重量</li>
+							<li>温度</li>
+							<li>能量</li>
+							<li>面积</li>
+							<li>速度</li>
+							<li>时间</li>
+							<li>功率</li>
+							<li>数据</li>
+							<li>压强</li>
+							<li>角度</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
 		</div>
 		<div>
 			<p class="screen">0</p>
@@ -31,29 +67,28 @@
 			<button class="key">%</button>
 			<button class="key">CE</button>
 			<button class="key">C</button>
-			<button class="key"><-< /button>
-					<button class="key">1/x</button>
-					<button class="key">x^2</button>
-					<button class="key">1</button>
-					<button class="key">/</button>
-					<button class="key">7</button>
-					<button class="key">8</button>
-					<button class="key">9</button>
-					<button class="key">*</button>
-					<button class="key">4</button>
-					<button class="key">5</button>
-					<button class="key">6</button>
-					<button class="key">-</button>
-					<button class="key">1</button>
-					<button class="key">2</button>
-					<button class="key">3</button>
-					<button class="key">+</button>
-					<button class="key">+/-</button>
-					<button class="key">0</button>
-					<button class="key">.</button>
-					<button class="key" style="background: #0067c0;">=</button>
+			<button class="key backimage"></button>
+			<button class="key">1/x</button>
+			<button class="key">x^2</button>
+			<button class="key">2√￣</button>
+			<button class="key">/</button>
+			<button class="key numback">7</button>
+			<button class="key numback">8</button>
+			<button class="key numback">9</button>
+			<button class="key">*</button>
+			<button class="key numback">4</button>
+			<button class="key numback">5</button>
+			<button class="key numback">6</button>
+			<button class="key">-</button>
+			<button class="key numback">1</button>
+			<button class="key numback">2</button>
+			<button class="key numback">3</button>
+			<button class="key">+</button>
+			<button class="key numback">+/-</button>
+			<button class="key numback">0</button>
+			<button class="key numback">.</button>
+			<button class="key equlback">=</button>
 		</div>
-		<div>这里弹出div</div>
 	</div>
 </body>
 <script type="text/javascript">
@@ -61,23 +96,38 @@
 	const keys = document.querySelectorAll(".key");
 	keys.forEach(key => {
 		key.addEventListener("click", () => {
-			const action = key.textContent;
+			let action = key.textContent;
+			action = (action == null || action == "") ? "<-" : action;
 			console.log(action);
 			if (action == "C") {
 				screen.textContent = "0";
 			} else if (action == "=") {
 				screen.textContent = eval(screen.textContent);
+			} else if (action == "<-") {
+				if (screen.textContent.length == 1) {
+					screen.textContent = "0"
+				} else {
+					let str = screen.textContent;
+					screen.textContent = str.substring(0, str.length - 1)
+				}
 			} else {
 				if (screen.textContent == "0") {
 					screen.textContent = action;
-				} else {
-					if (screen.textContent.length < 13) {
-						screen.textContent += action;
-					}
+				} else if (screen.textContent.length < 13) {
+					screen.textContent += action;
 				}
 			}
 		})
 	});
+
+	const menubtn = document.getElementById("setnemu");
+	const menudv = document.getElementById("menudv");
+
+	let isMenuDvDisplay = false;
+	menubtn.onclick = function () {
+		isMenuDvDisplay ? menudv.style.display = "none" : menudv.style.display = "block";
+		isMenuDvDisplay = !isMenuDvDisplay;
+	}
 </script>
 
 </html>
