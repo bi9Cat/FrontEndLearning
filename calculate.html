@@ -10,26 +10,34 @@
 <body>
 	<div class="container">
 		<div style="margin: 10px; font-size: 10px; pointer-events: none;">计算器</div>
+<<<<<<< HEAD
 		<div id="menu" class="bordmargin">
 			<button id="setnemu">
 				<img src="./images/icons8-菜单-50.png" alt="Icon" />
 			</button>
 			<p style="display: inline;font-size: 25px;">标准</p>
+=======
+		<div id="menu">
+			<button id="setnemu">
+				<img src="./images/icons8-菜单-50.png" alt="Icon" />
+			</button>
+			<p style="display: inline;font-size: 25px">标准</p>
+>>>>>>> 80f9939736a4ce148e43f0f766c82db6a3cbe0c5
 			<button>
-				<img src="./images/icons8-最大化-50.png" />
+				<img src="./images/icons8-最大化-50.png" alt="Icon" />
 			</button>
 			<button style="float: right;margin-right:10px;">
-				<img src="./images/icons8-历史-48.png" />
+				<img src="./images/icons8-历史-48.png" alt="Icon"/>
 			</button>
 			<div id="menudv" class="v1 animation-slide-left">
 				<ul id="menuul">
 					<li class="grayfont">计算器
 						<ul>
-							<li class="backimagebiaozhun">标准</li>
-							<li class="backimagekexu">科学</li>
-							<li class="backimagehuitu">绘图</li>
-							<li class="backimagechengxuyuan">程序员</li>
-							<li class="backimageriqi">日期计算</li>
+							<li class="backimage backimagebiaozhun">标准</li>
+							<li class="backimage backimagekexu">科学</li>
+							<li class="backimage backimagehuitu">绘图</li>
+							<li class="backimage backimagechengxuyuan">程序员</li>
+							<li class="backimage backimageriqi">日期计算</li>
 						</ul>
 					</li>
 					<li class="grayfont">转换器
@@ -52,10 +60,14 @@
 				</ul>
 			</div>
 		</div>
-		<div>
+		<div class="screenbox">
 			<p class="screen">0</p>
 		</div>
+<<<<<<< HEAD
 		<div class="spopboard bordmargin">
+=======
+		<div class="spopboard divmargin">
+>>>>>>> 80f9939736a4ce148e43f0f766c82db6a3cbe0c5
 			<button class="spop">MC</button>
 			<button class="spop">MR</button>
 			<button class="spop">M+</button>
@@ -63,31 +75,48 @@
 			<button class="spop">MS</button>
 			<button class="spop">Mv</button>
 		</div>
-		<div class="keyboard">
-			<button class="key">%</button>
-			<button class="key">CE</button>
-			<button class="key">C</button>
-			<button class="key backimage"></button>
-			<button class="key">1/x</button>
-			<button class="key">x^2</button>
-			<button class="key">2√￣</button>
-			<button class="key">/</button>
-			<button class="key numback">7</button>
-			<button class="key numback">8</button>
-			<button class="key numback">9</button>
-			<button class="key">*</button>
-			<button class="key numback">4</button>
-			<button class="key numback">5</button>
-			<button class="key numback">6</button>
-			<button class="key">-</button>
-			<button class="key numback">1</button>
-			<button class="key numback">2</button>
-			<button class="key numback">3</button>
-			<button class="key">+</button>
-			<button class="key numback">+/-</button>
-			<button class="key numback">0</button>
-			<button class="key numback">.</button>
-			<button class="key equlback">=</button>
+		<div >
+			<div class="keyboard">
+				<button class="key">%</button>
+				<button class="key">CE</button>
+				<button class="key">C</button>
+				<button class="key backimage"></button>
+			</div>
+			<div class="keyboard">
+				<button class="key">1/x</button>
+				<button class="key">x^2</button>
+				<button class="key">2√￣</button>
+				<button class="key">/</button>
+			</div>
+
+			<div class="keyboard">
+				<button class="key numback">7</button>
+				<button class="key numback">8</button>
+				<button class="key numback">9</button>
+				<button class="key">*</button>
+			</div>
+
+			<div class="keyboard">
+				<button class="key numback">4</button>
+				<button class="key numback">5</button>
+				<button class="key numback">6</button>
+				<button class="key">-</button>
+			</div>
+
+			<div class="keyboard">
+				<button class="key numback">1</button>
+				<button class="key numback">2</button>
+				<button class="key numback">3</button>
+				<button class="key">+</button>
+			</div>
+
+			<div class="keyboard">
+				<button class="key numback">+/-</button>
+				<button class="key numback">0</button>
+				<button class="key numback">.</button>
+				<button class="key equlback">=</button>
+			</div>
+
 		</div>
 	</div>
 </body>
@@ -113,7 +142,7 @@
 			} else {
 				if (screen.textContent == "0") {
 					screen.textContent = action;
-				} else if (screen.textContent.length < 13) {
+				} else if (screen.textContent.length < 20) {
 					screen.textContent += action;
 				}
 			}
