@@ -11,11 +11,39 @@
 <body>
     <div class="container">
         <div class="gamenav">
+            <div class="gameAction">
+                <div class="imageUpload">
+                    <input type="text" id="imagePath" disabled>
+                    <div>
+                        <button class="imageSelect"
+                            onclick="document.getElementById('upladImage').click()">选择图片</button>
+                    </div>
+                    <input type="file" id="upladImage" accept="image/jpeg,image/png,image/jpg" onchange="uploadImage()">
+                </div>
+                <div class="levelSelect">
+                    <span>难度等级</span>
+                    <select name="level" id="level">
+                        <option value="3">3x3</option>
+                        <option value="4">4x4</option>
+                        <option value="5">5x5</option>
+                    </select>
+                </div>
+                <button class="start" onclick="start()">开始</button>
+            </div>
+            <div class="gameData">
+                <span class="gameSuccess">SUCCESS!</span>
+                <div class="costTime">
+                    <span>已用时</span>
+                    <span id="hour">0小时</span>
+                    <span id="minute">0分钟</span>
+                    <span id="second">0秒</span>
+                </div>
+            </div>
 
         </div>
 
         <div class="gamepannel">
-            
+
         </div>
     </div>
 </body>

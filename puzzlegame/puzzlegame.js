@@ -1,48 +1,113 @@
-const imageUlr = "../images/生成图片.png"
-const imagePieces = []; // 存储切片后的图片
+var imageUlr = "../images/生成图片.png"
+var imagePieces = []; // 存储切片后的图片
 
-const piecesWidth = 100;
-const piecesHeight = 100;
+var piecesWidth = 100;
+var piecesHeight = 100;
 
-const gameSize = 3;
+var gameSize = 3;
+
+var timer;
 
 
 
-// 图片切片
-let imgNum = 0;
-for (let i = 0; i < gameSize; i++) {
-    for (let j = 0; j < gameSize; j++) {
-        const div = document.createElement('div');
-        div.id = imgNum++;
-        div.textContent = div.id;
-        div.classList.add('image-piece');
-        div.style.backgroundSize = `${piecesWidth * gameSize}px ${piecesHeight * gameSize}px`
-        div.style.backgroundImage = `url(${imageUlr})`;
-        div.style.backgroundPosition = `-${j * piecesWidth}px -${i * piecesHeight}px`;
+function start() {
+    // 清空屏幕
+    clearGamePannel();
 
-        imagePieces.push(div);
+    // 设置游戏难度
+    setGameLevel();
+
+    // 图片切片
+    sliceImages();
+
+    // 随机分布
+    shuffleImage();
+
+    stopTimer();
+    // 开启定时器
+    startTimer();
+
+}
+
+function uploadImage() {
+    let filePath = document.getElementById("upladImage").value;
+    document.getElementById("imagePath").value = filePath;
+    let file = document.getElementById("upladImage").files[0];
+    let url = getUrl(file);
+    imageUlr = url;
+
+    function getUrl(file) {
+        let url = '';
+        if (window.createObjectURL != undefined) {
+            url = window.createObjectURL(file);
+        } else if (window.webkitURL != undefined) {
+            url = window.webkitURL.createObjectURL(file);
+        } else if (window.URL != undefined) {
+            url = window.URL.createObjectURL(file);
+        }
+        return url;
     }
 }
 
+function setGameLevel() {
+    var levelSelect = document.getElementById("level");
+    var index = levelSelect.selectedIndex;
+    gameSize = levelSelect.options[index].value;
 
-// 随机分布
-const gamePannel = document.querySelector('.gamepannel');
-const maxX = gamePannel.getBoundingClientRect().width - piecesWidth;
-const maxY = gamePannel.getBoundingClientRect().height - piecesHeight;
+    console.log("gameSize:" + gameSize);
+}
 
-imagePieces.forEach(piece => {
-    const randomX = Math.floor(Math.random() * maxX);
-    const randomY = Math.floor(gamePannel.getBoundingClientRect().top) + Math.floor(Math.random() * maxY);
+function clearGamePannel() {
+    const gamePannel = document.querySelector('.gamepannel');
+    if (imagePieces != null && imagePieces.length > 0) {
+        imagePieces.forEach(piece => {
+            gamePannel.removeChild(piece);
+        });
+        imagePieces.length = 0;
+    }
 
-    piece.style.left = randomX + "px";
-    piece.style.top = randomY + "px";
-    gamePannel.appendChild(piece);
-});
+    document.querySelector(".gameSuccess").style.visibility = "hidden";
+}
 
+function sliceImages() {
 
+    console.log(imageUlr);
+    let imgNum = 0;
+    for (let i = 0; i < gameSize; i++) {
+        for (let j = 0; j < gameSize; j++) {
+            const div = document.createElement('div');
+            div.id = imgNum++;
+            //div.textContent = div.id;
+            div.classList.add('image-piece');
+            div.style.backgroundSize = `${piecesWidth * gameSize}px ${piecesHeight * gameSize}px`
+            div.style.backgroundImage = `url(${imageUlr})`;
+            div.style.backgroundPosition = `-${j * piecesWidth}px -${i * piecesHeight}px`;
+            imagePieces.push(div);
+        }
+    }
+}
+
+function shuffleImage() {
+    const gamePannel = document.querySelector('.gamepannel');
+    const maxX = gamePannel.getBoundingClientRect().width - piecesWidth;
+    const maxY = gamePannel.getBoundingClientRect().height - piecesHeight;
+
+    imagePieces.forEach(piece => {
+        const randomX = Math.floor(Math.random() * maxX);
+        const randomY = Math.floor(gamePannel.getBoundingClientRect().top) + Math.floor(Math.random() * maxY);
+
+        piece.style.left = randomX + "px";
+        piece.style.top = randomY + "px";
+        gamePannel.appendChild(piece);
+    });
+}
+
+console.log(document.getElementById("upladImage"));
+
+// let uploadImageOnclick = document.getElementById("upladImage").onClick();
+// document.getElementById("imageSelect").addEventListener('click', uploadImageOnclick);
 
 // 绑定点击鼠标事件，记录下点击位置和 元素位置的偏移量
-
 let dx;
 let dy;
 let selectImage;
@@ -98,6 +163,8 @@ document.addEventListener('mouseup', (e) => {
 
         if (isSuccess(imagePieces)) {
             console.log("SUCCESS!");
+            document.querySelector(".gameSuccess").style.visibility = 'visible';
+            stopTimer();
         }
     }
 });
@@ -186,4 +253,23 @@ function isRightOrder(piece) {
         }
     }
     return true;
+}
+
+
+function startTimer() {
+    let timeCost = 4800;
+    timer = setInterval(() => {
+        timeCost++;
+        let second = timeCost % 60;
+        let minute = Math.floor(timeCost / 60) % 60;
+        let hour = Math.floor(timeCost / 3600);
+
+        document.getElementById("second").textContent = `${second}秒`;
+        document.getElementById("minute").textContent = `${minute}分钟`;
+        document.getElementById("hour").textContent = `${hour}小时`;
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timer);
 }
