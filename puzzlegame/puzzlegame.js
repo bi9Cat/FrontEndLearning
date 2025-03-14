@@ -104,8 +104,11 @@ function shuffleImage() {
 
 console.log(document.getElementById("upladImage"));
 
-// let uploadImageOnclick = document.getElementById("upladImage").onClick();
-// document.getElementById("imageSelect").addEventListener('click', uploadImageOnclick);
+// 把按钮的click事件绑定为 inputFile的click
+document.getElementById("imageSelect").addEventListener('click', () => {
+    const inputFile = document.getElementById('upladImage');
+    inputFile.click();
+});
 
 // 绑定点击鼠标事件，记录下点击位置和 元素位置的偏移量
 let dx;
@@ -257,7 +260,7 @@ function isRightOrder(piece) {
 
 
 function startTimer() {
-    let timeCost = 4800;
+    let timeCost = 0;
     timer = setInterval(() => {
         timeCost++;
         let second = timeCost % 60;
