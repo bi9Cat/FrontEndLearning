@@ -102,8 +102,6 @@ function shuffleImage() {
     });
 }
 
-console.log(document.getElementById("upladImage"));
-
 // 把按钮的click事件绑定为 inputFile的click
 document.getElementById("imageSelect").addEventListener('click', () => {
     const inputFile = document.getElementById('upladImage');
@@ -169,97 +167,97 @@ document.addEventListener('mouseup', (e) => {
             document.querySelector(".gameSuccess").style.visibility = 'visible';
             stopTimer();
         }
-    }
-});
 
-// 能否吸附，可以吸附的话返回吸附的目标图片及方向
-function needClingHere(selectImage, pieces) {
+        // 能否吸附，可以吸附的话返回吸附的目标图片及方向
+        function needClingHere(selectImage, pieces) {
 
-    const selectImageCenterX = selectImage.getBoundingClientRect().left + selectImage.getBoundingClientRect().width / 2;
-    const selectImageCenterY = selectImage.getBoundingClientRect().top + selectImage.getBoundingClientRect().height / 2
-    console.log("selectImageCenterX:" + selectImageCenterX + ",selectImageCenterY:" + selectImageCenterY);
+            const selectImageCenterX = selectImage.getBoundingClientRect().left + selectImage.getBoundingClientRect().width / 2;
+            const selectImageCenterY = selectImage.getBoundingClientRect().top + selectImage.getBoundingClientRect().height / 2
+            console.log("selectImageCenterX:" + selectImageCenterX + ",selectImageCenterY:" + selectImageCenterY);
 
-    let clingImage = null;
-    let minDistance = Number.MAX_SAFE_INTEGER;
-    pieces.forEach(piece => {
-        if (piece.id != selectImage.id) {
-            const pieceCenterX = piece.getBoundingClientRect().left + piece.getBoundingClientRect().width / 2;
-            const pieceCenterY = piece.getBoundingClientRect().top + piece.getBoundingClientRect().height / 2;
+            let clingImage = null;
+            let minDistance = Number.MAX_SAFE_INTEGER;
+            pieces.forEach(piece => {
+                if (piece.id != selectImage.id) {
+                    const pieceCenterX = piece.getBoundingClientRect().left + piece.getBoundingClientRect().width / 2;
+                    const pieceCenterY = piece.getBoundingClientRect().top + piece.getBoundingClientRect().height / 2;
+                    const dx = Math.abs(selectImageCenterX - pieceCenterX);
+                    const dy = Math.abs(selectImageCenterY - pieceCenterY);
+                    if (dx <= 150 && dy <= 150) {
+                        const distance = calculateDistance(selectImageCenterX, selectImageCenterY, pieceCenterX, pieceCenterY);
+                        console.log(piece.id + ":" + distance)
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            clingImage = piece;
+                        }
+                    }
+                }
+            });
+
+            if (clingImage === null) {
+                return [];
+            }
+
+            const pieceCenterX = clingImage.getBoundingClientRect().left + clingImage.getBoundingClientRect().width / 2;
+            const pieceCenterY = clingImage.getBoundingClientRect().top + clingImage.getBoundingClientRect().height / 2;
             const dx = Math.abs(selectImageCenterX - pieceCenterX);
             const dy = Math.abs(selectImageCenterY - pieceCenterY);
-            if (dx <= 150 && dy <= 150) {
-                const distance = calculateDistance(selectImageCenterX, selectImageCenterY, pieceCenterX, pieceCenterY);
-                console.log(piece.id + ":" + distance)
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    clingImage = piece;
-                }
+            if (dx > dy) {
+                dir = selectImageCenterX < pieceCenterX ? "A" : "D";
+            } else {
+                dir = selectImageCenterY < pieceCenterY ? "W" : "S";
             }
+
+            console.log(dir);
+            return [clingImage, dir]
         }
-    });
 
-    if (clingImage === null) {
-        return [];
-    }
-
-    const pieceCenterX = clingImage.getBoundingClientRect().left + clingImage.getBoundingClientRect().width / 2;
-    const pieceCenterY = clingImage.getBoundingClientRect().top + clingImage.getBoundingClientRect().height / 2;
-    const dx = Math.abs(selectImageCenterX - pieceCenterX);
-    const dy = Math.abs(selectImageCenterY - pieceCenterY);
-    if (dx > dy) {
-        dir = selectImageCenterX < pieceCenterX ? "A" : "D";
-    } else {
-        dir = selectImageCenterY < pieceCenterY ? "W" : "S";
-    }
-
-    console.log(dir);
-    return [clingImage, dir]
-}
-
-function calculateDistance(x1, y1, x2, y2) {
-    return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
-}
-
-
-// 判断游戏是否结束
-function isSuccess(piece) {
-    if (isRightGrid(piece)) {
-        return isRightOrder(piece);
-    }
-    return false;
-}
-
-function isRightGrid(piece) {
-    const rowSet = new Set();
-    const colSet = new Set();
-
-    piece.forEach(piece => {
-        rowSet.add(piece.style.top);
-        colSet.add(piece.style.left);
-    });
-    console.log(typeof gameSize);
-    console.log(typeof rowSet.size);
-    console.log(rowSet.size === gameSize && colSet.size === gameSize);
-    return rowSet.size === gameSize && colSet.size === gameSize;
-}
-
-function isRightOrder(piece) {
-    piece.sort(function (a, b) {
-        if (a.getBoundingClientRect().top === b.getBoundingClientRect().top) {
-            return a.getBoundingClientRect().left - b.getBoundingClientRect().left;
+        function calculateDistance(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
         }
-        return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
-    });
 
-    console.log(piece);
 
-    for (let i = 0; i < gameSize * gameSize; i++) {
-        if (piece[i].id != i) {
+        // 判断游戏是否结束
+        function isSuccess(piece) {
+            if (isRightGrid(piece)) {
+                return isRightOrder(piece);
+            }
             return false;
         }
+
+        function isRightGrid(piece) {
+            const rowSet = new Set();
+            const colSet = new Set();
+
+            piece.forEach(piece => {
+                rowSet.add(piece.style.top);
+                colSet.add(piece.style.left);
+            });
+            console.log(typeof gameSize);
+            console.log(typeof rowSet.size);
+            console.log(rowSet.size === gameSize && colSet.size === gameSize);
+            return rowSet.size === gameSize && colSet.size === gameSize;
+        }
+
+        function isRightOrder(piece) {
+            piece.sort(function (a, b) {
+                if (a.getBoundingClientRect().top === b.getBoundingClientRect().top) {
+                    return a.getBoundingClientRect().left - b.getBoundingClientRect().left;
+                }
+                return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
+            });
+
+            console.log(piece);
+
+            for (let i = 0; i < gameSize * gameSize; i++) {
+                if (piece[i].id != i) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
-    return true;
-}
+});
 
 
 function startTimer() {
