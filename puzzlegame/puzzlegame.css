@@ -73,6 +73,9 @@ body {
 #level option {
     border: none
 }
+#level option:hover{
+    background-color: #2980b9;
+}
 
 .start {
     padding: 6px 20px;

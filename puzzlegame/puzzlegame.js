@@ -52,7 +52,7 @@ function uploadImage() {
 function setGameLevel() {
     var levelSelect = document.getElementById("level");
     var index = levelSelect.selectedIndex;
-    gameSize = levelSelect.options[index].value;
+    gameSize = Number(levelSelect.options[index].value);
 
     console.log("gameSize:" + gameSize);
 }
@@ -147,16 +147,16 @@ document.addEventListener('mouseup', (e) => {
 
         // 判断吸附
         const [piece, dir] = needClingHere(selectImage, imagePieces);
-        if (dir == "D") {
+        if (dir === "D") {
             selectImage.style.top = piece.style.top;
             selectImage.style.left = piece.getBoundingClientRect().left + piece.getBoundingClientRect().width + 2 + "px";
-        } else if (dir == "A") {
+        } else if (dir === "A") {
             selectImage.style.top = piece.style.top;
             selectImage.style.left = piece.getBoundingClientRect().left - selectImage.getBoundingClientRect().width - 2 + "px";
-        } else if (dir == "W") {
+        } else if (dir === "W") {
             selectImage.style.top = piece.getBoundingClientRect().top - selectImage.getBoundingClientRect().height - 2 + "px";
             selectImage.style.left = piece.style.left;
-        } else if (dir == "S") {
+        } else if (dir === "S") {
             selectImage.style.top = piece.getBoundingClientRect().top + selectImage.getBoundingClientRect().height + 2 + "px";
             selectImage.style.left = piece.style.left;
         }
@@ -179,7 +179,7 @@ function needClingHere(selectImage, pieces) {
     const selectImageCenterY = selectImage.getBoundingClientRect().top + selectImage.getBoundingClientRect().height / 2
     console.log("selectImageCenterX:" + selectImageCenterX + ",selectImageCenterY:" + selectImageCenterY);
 
-    let clingImage
+    let clingImage = null;
     let minDistance = Number.MAX_SAFE_INTEGER;
     pieces.forEach(piece => {
         if (piece.id != selectImage.id) {
@@ -198,7 +198,7 @@ function needClingHere(selectImage, pieces) {
         }
     });
 
-    if (clingImage == null) {
+    if (clingImage === null) {
         return [];
     }
 
@@ -237,12 +237,15 @@ function isRightGrid(piece) {
         rowSet.add(piece.style.top);
         colSet.add(piece.style.left);
     });
-    return rowSet.size == gameSize && colSet.size == gameSize;
+    console.log(typeof gameSize);
+    console.log(typeof rowSet.size);
+    console.log(rowSet.size === gameSize && colSet.size === gameSize);
+    return rowSet.size === gameSize && colSet.size === gameSize;
 }
 
 function isRightOrder(piece) {
     piece.sort(function (a, b) {
-        if (a.getBoundingClientRect().top == b.getBoundingClientRect().top) {
+        if (a.getBoundingClientRect().top === b.getBoundingClientRect().top) {
             return a.getBoundingClientRect().left - b.getBoundingClientRect().left;
         }
         return a.getBoundingClientRect().top - b.getBoundingClientRect().top;
