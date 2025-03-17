@@ -1,0 +1,126 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: 100%;
+    width: 100%;
+}
+
+.gamenav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 20%;
+    width: 100%;
+}
+
+.gameAction {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 50%;
+}
+
+.imageUpload {
+    display: flex;
+    align-items: center;
+}
+
+.imageUpload #upladImage {
+    display: none;
+}
+
+.imageUpload #imagePath {
+    padding: 6px;
+    border: 1px solid #2980b9;
+    border-radius: 3px;
+    color: #bdc3c7;
+}
+
+.imageUpload .imageSelect {
+    border: 1px solid #ecf0f1;
+    background-color: #2980b9;
+    border-radius: 3px;
+    padding: 6px;
+    margin: 0px;
+    font-size: 15px;
+    color: #ffffff;
+}
+
+.levelSelect span {
+    font-size: 20px;
+    color: #636e72;
+}
+
+#level {
+    padding: 6px;
+    border: 1px solid #2980b9;
+    border-radius: 3px;
+}
+
+#level option {
+    border: none
+}
+#level option:hover{
+    background-color: #2980b9;
+}
+
+.start {
+    padding: 6px 20px;
+    border: 1px solid #ecf0f1;
+    background-color: #2980b9;
+    border-radius: 3px;
+    font-size: 15px;
+    color: #ffffff;
+}
+
+.gameData {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 50%;
+}
+
+.gameSuccess {
+    visibility: hidden;
+    font-size: 40px;
+    color: #1abc9c;
+}
+
+.costTime {
+    font-size: 20px;
+    color: #c0392b;
+}
+
+
+.gamepannel {
+    height: 80%;
+    width: 100%;
+}
+
+.image-piece {
+    width: 100px;
+    height: 100px;
+    cursor: grab;
+    position: absolute;
+    border: 1px;
+    border-radius: 3px;
+}
+
+.selectImage {
+    cursor: grabbing;
+    z-index: 10;
+}
