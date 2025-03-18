@@ -38,11 +38,11 @@ body {
     align-items: center;
 }
 
-.imageUpload #upladImage {
+.upladImage {
     display: none;
 }
 
-.imageUpload #imagePath {
+.imagePath {
     padding: 6px;
     border: 1px solid #2980b9;
     border-radius: 3px;

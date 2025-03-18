@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import ImageSlice from "./ImageSlice";
 
@@ -8,37 +8,53 @@ interface GamePannelProps {
     gameSize: number;
 }
 
-const GamePannel: React.FC<GamePannelProps> = ({ imageUrl, gameSize }) => {
+export type ImgPosition = {
+    id: number;
+    positionX: number;
+    positionY: number;
+}
 
-    const ref = useRef<HTMLDivElement>(null);
+const GamePannel = ({ imageUrl, gameSize }: GamePannelProps) => {
 
     let maxX: number = 1500;
-    let maxY: number = 800;
+    let maxY: number = 700;
 
-    // TODO
-    // useEffect(() => {
-    //     if (ref.current) {
-    //         const { width: rectWidth, height: rectHeight } = ref.current.getBoundingClientRect();
-    //         maxX = rectWidth;
-    //         maxY = rectHeight;
-    //         console.log(maxX + "," + maxY);
-    //     }
-    // }, []);
+    const initImageSlicePositions: ImgPosition[] = Array.from({ length: gameSize * gameSize }, (_, index) => ({
+        id: index,
+        positionX: Math.floor(Math.random() * maxX),
+        positionY: Math.floor(Math.random() * maxY),
+    }));
 
-    const imageSlices = [];
-    for (let i = 0; i < gameSize * gameSize; i++) {
-        imageSlices[i] = <ImageSlice
-            key={i}
-            id={i}
-            imageUrl={imageUrl}
-            gameSize={gameSize}
-            maxX={maxX}
-            maxY={maxY}
-        />
+    const [imageSlicePositions, setImageSlicePositions] = useState(initImageSlicePositions);
+
+    const handleMoveImageSlice = (id: number, newPositionX: number, newPositionY: number) => {
+        const newPositionList = imageSlicePositions.map((position) => {
+            if (position.id === id) {
+                return {
+                    ...position,
+                    positionX: newPositionX,
+                    positionY: newPositionY
+                }
+            }
+            return position;
+        });
+        setImageSlicePositions(newPositionList);
     }
 
+    const imageSlices = imageSlicePositions.map((_, index) => {
+        return <ImageSlice
+            key={index}
+            id={index}
+            imageUrl={imageUrl}
+            gameSize={gameSize}
+            piecesSize={100}
+            onUpdate={handleMoveImageSlice}
+            imageSlicePositions={imageSlicePositions}
+        />
+    });
+
     return (
-        <div ref={ref}>
+        <div>
             {imageSlices}
         </div>
     );

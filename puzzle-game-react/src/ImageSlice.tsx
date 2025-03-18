@@ -1,88 +1,156 @@
 import React, { useEffect, useRef, useState } from "react";
 import './puzzlegame.css';
+import { ImgPosition } from "./GamePannel";
 
 interface ImageSliceProps {
-    imageUrl: string;
     id: number;
+    imageUrl: string;
     gameSize: number;
-    maxX: number;
-    maxY: number;
+    piecesSize: number;
+    imageSlicePositions: Array<ImgPosition>
+
+    onUpdate: (id: number, newPositionX: number, newPositionY: number) => void
 }
 
-const ImageSlice: React.FC<ImageSliceProps> = ({ imageUrl, id, gameSize, maxX, maxY }) => {
+type NeedClingResult = {
+    clingImage: ImgPosition;
+    dir: string;
+}
 
-    const piecesSize = 100;
-    let i = Math.floor(id / gameSize);
-    let j = id % gameSize;
+const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePositions, ...rest }: ImageSliceProps) => {
 
-    let randomX = Math.floor(Math.random() * maxX);
-    let randomY = Math.floor(Math.random() * maxY);
+    const isDragging = useRef(false); // 用来标记是否被选中
+    const startPosition = useRef({ startPositionX: 0, startPositionY: 0 }); // 点击时点击位置与图片左上角的偏移量
 
-
-    const imageRef = useRef<HTMLImageElement>(null);
-    const [isDragging, setIsDragging] = useState(false); // 是否选中
-    const [position, setPosition] = useState({ positionX: randomX, positionY: randomY }); // 图片初始位置
-    const [startPosition, setStartPosition] = useState({ startPositionX: 0, startPositionY: 0 }); // 点击时点击位置与图片左上角的偏移量
-
- 
-    const imageStyle = {
-        backgroundSize: `${piecesSize * gameSize}px ${piecesSize * gameSize}px`,
-        backgroundImage: `url(${imageUrl})`,
-        backgroundPosition: `-${j * piecesSize}px -${i * piecesSize}px`,
-        left: `${position.positionX}px`,
-        top: `${position.positionY}px`
+    const imgPosition = (): ImgPosition | undefined => {
+        const currentImgPosition: ImgPosition | undefined = imageSlicePositions.find(p => p.id === id);
+        return currentImgPosition;
     }
 
+
+    const initStyle = () => {
+        const currentImgPsotion = imgPosition();
+        let i = Math.floor(id / gameSize);
+        let j = id % gameSize;
+        const imageStyle = {
+            backgroundSize: `${piecesSize * gameSize}px ${piecesSize * gameSize}px`,
+            backgroundImage: `url(${imageUrl})`,
+            backgroundPosition: `-${j * piecesSize}px -${i * piecesSize}px`,
+            left: `${currentImgPsotion && currentImgPsotion.positionX}px`,
+            top: `${currentImgPsotion && currentImgPsotion.positionY}px`
+        }
+        return imageStyle;
+    }
 
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-        setIsDragging(true);
-        setStartPosition({
-            startPositionX: event.clientX - position.positionX,
-            startPositionY: event.clientY - position.positionY
-        })
+        const currentImgPsotion = imgPosition();
+        if (!currentImgPsotion) {
+            return;
+        }
+        isDragging.current = true;
+        startPosition.current = {
+            startPositionX: event.clientX - currentImgPsotion.positionX,
+            startPositionY: event.clientY - currentImgPsotion.positionY
+        };
     }
 
-    const handleMouseMove = (event: MouseEvent) => {
-        if (isDragging && imageRef.current) {
-            const newX = event.clientX - startPosition.startPositionX;
-            const newY = event.clientY - startPosition.startPositionY;
-            setPosition({
-                positionX: newX,
-                positionY: newY
-            });
-
-            console.log("newX:" + newX + ",newY:" + newY);
+    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+        if (isDragging.current) {
+            const newX = event.clientX - startPosition.current.startPositionX;
+            const newY = event.clientY - startPosition.current.startPositionY;
+            onUpdate(id, newX, newY);
         }
     }
 
     const handleMouseUp = () => {
-        setIsDragging(false);
+
+        const currentImgPsotion = imgPosition();
+        isDragging.current = false;
+
+        const clingResult = needClingHere();
+        if (clingResult) {
+            const { dir, clingImage } = clingResult;
+            console.log(clingImage.id);
+            if (dir === 'D') {
+                onUpdate(id, clingImage.positionX + piecesSize + 2, clingImage.positionY);
+            } else if (dir === 'A') {
+                onUpdate(id, clingImage.positionX - piecesSize - 2, clingImage.positionY);
+            } else if (dir === 'W') {
+                onUpdate(id, clingImage.positionX, clingImage.positionY - piecesSize - 2);
+            } else if (dir === 'S') {
+                onUpdate(id, clingImage.positionX, clingImage.positionY + piecesSize + 2);
+            }
+        }
     }
 
-    useEffect(() => {
-        if (isDragging) {
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
-        } else {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        }
-        return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isDragging]);
+    const needClingHere = (): NeedClingResult | null => {
+        const currentImgPsotion = imgPosition();
+        console.log("handleMouseUp");
+        console.log(imageSlicePositions);
+        console.log(currentImgPsotion);
 
-    
+        if (!currentImgPsotion) {
+            return null;
+        }
+        const centerX = currentImgPsotion.positionX + piecesSize / 2;
+        const centerY = currentImgPsotion.positionY + piecesSize / 2;
+
+        let clingImage: ImgPosition | undefined;
+        let minDistance = Number.MAX_SAFE_INTEGER;
+        imageSlicePositions.forEach(imgPosition => {
+            if (imgPosition.id !== id) {
+                const imgPositionCenterX = imgPosition.positionX + piecesSize / 2;
+                const imgPositionCenterY = imgPosition.positionY + piecesSize / 2;
+
+                const dx = Math.abs(centerX - imgPositionCenterX);
+                const dy = Math.abs(centerY - imgPositionCenterY);
+
+                if (dx <= (piecesSize + 50) && dy <= (piecesSize + 50)) {
+                    const distance = calculateDistance(centerX, centerY, imgPositionCenterX, imgPositionCenterY);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        clingImage = imgPosition;
+                    }
+                }
+            }
+        });
+
+        if (!clingImage) {
+            return null;
+        }
+
+        const imgPositionCenterX = clingImage.positionX + piecesSize / 2;
+        const imgPositionCenterY = clingImage.positionY + piecesSize / 2;
+
+        const dx = Math.abs(centerX - imgPositionCenterX);
+        const dy = Math.abs(centerY - imgPositionCenterY);
+        let dir;
+        if (dx > dy) {
+            dir = centerX < imgPositionCenterX ? "A" : "D";
+        } else {
+            dir = centerY < imgPositionCenterY ? "W" : "S";
+        }
+
+        return {
+            clingImage: clingImage,
+            dir: dir
+        };
+    }
+
+    const calculateDistance = (x1: number, y1: number, x2: number, y2: number) => {
+        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+    }
+
 
     return (
         <div
-            ref={imageRef}
             key={id}
-            className="image-piece"
-            style={imageStyle}
+            className={`image-piece ${isDragging ? 'selectImage' : ''}`}
+            style={initStyle()}
             onMouseDown={handleMouseDown}
-        />
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+        ></div>
     );
 }
 
