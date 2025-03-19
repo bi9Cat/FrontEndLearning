@@ -12,21 +12,20 @@ interface ImageSliceProps {
     onUpdate: (id: number, newPositionX: number, newPositionY: number) => void
 }
 
-type NeedClingResult = {
+interface NeedClingResult {
     clingImage: ImgPosition;
     dir: string;
 }
 
 const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePositions, ...rest }: ImageSliceProps) => {
 
-    const isDragging = useRef(false); // 用来标记是否被选中
+    const [isDragging, setIsDragging] = useState(false); // 用来标记是否被选中
     const startPosition = useRef({ startPositionX: 0, startPositionY: 0 }); // 点击时点击位置与图片左上角的偏移量
 
     const imgPosition = (): ImgPosition | undefined => {
         const currentImgPosition: ImgPosition | undefined = imageSlicePositions.find(p => p.id === id);
         return currentImgPosition;
     }
-
 
     const initStyle = () => {
         const currentImgPsotion = imgPosition();
@@ -47,15 +46,15 @@ const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePo
         if (!currentImgPsotion) {
             return;
         }
-        isDragging.current = true;
         startPosition.current = {
             startPositionX: event.clientX - currentImgPsotion.positionX,
             startPositionY: event.clientY - currentImgPsotion.positionY
         };
+        setIsDragging(true);
     }
 
     const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (isDragging.current) {
+        if (isDragging) {
             const newX = event.clientX - startPosition.current.startPositionX;
             const newY = event.clientY - startPosition.current.startPositionY;
             onUpdate(id, newX, newY);
@@ -63,14 +62,14 @@ const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePo
     }
 
     const handleMouseUp = () => {
+        doClingImg();
+        setIsDragging(false);
+    }
 
-        const currentImgPsotion = imgPosition();
-        isDragging.current = false;
-
+    const doClingImg = () => {
         const clingResult = needClingHere();
         if (clingResult) {
             const { dir, clingImage } = clingResult;
-            console.log(clingImage.id);
             if (dir === 'D') {
                 onUpdate(id, clingImage.positionX + piecesSize + 2, clingImage.positionY);
             } else if (dir === 'A') {
@@ -85,9 +84,6 @@ const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePo
 
     const needClingHere = (): NeedClingResult | null => {
         const currentImgPsotion = imgPosition();
-        console.log("handleMouseUp");
-        console.log(imageSlicePositions);
-        console.log(currentImgPsotion);
 
         if (!currentImgPsotion) {
             return null;
@@ -140,7 +136,6 @@ const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePo
     const calculateDistance = (x1: number, y1: number, x2: number, y2: number) => {
         return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
     }
-
 
     return (
         <div

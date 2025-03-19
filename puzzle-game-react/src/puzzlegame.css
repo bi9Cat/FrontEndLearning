@@ -57,6 +57,11 @@ body {
     margin: 0px;
     font-size: 15px;
     color: #ffffff;
+    cursor: pointer;
+}
+
+.imageSelect:hover {
+    background-color: #3498db;
 }
 
 .levelSelect span {
@@ -73,7 +78,8 @@ body {
 #level option {
     border: none
 }
-#level option:hover{
+
+#level option:hover {
     background-color: #2980b9;
 }
 
@@ -84,6 +90,21 @@ body {
     border-radius: 3px;
     font-size: 15px;
     color: #ffffff;
+    cursor: pointer;
+}
+
+.start:not(:disabled):hover {
+    background-color: #3498db;
+}
+
+.startDisable {
+    padding: 6px 20px;
+    border: 1px solid #ecf0f1;
+    background-color: #bdc3c7;
+    border-radius: 3px;
+    font-size: 15px;
+    color: #ffffff;
+    cursor: not-allowed;
 }
 
 .gameData {
@@ -95,7 +116,6 @@ body {
 }
 
 .gameSuccess {
-    visibility: hidden;
     font-size: 40px;
     color: #1abc9c;
 }

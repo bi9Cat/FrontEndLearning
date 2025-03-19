@@ -1,11 +1,20 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import GamePannel from './GamePannel';
 import ImageInput from './ImageInput';
 import './puzzlegame.css';
+import { useGameStore } from './GameStore';
+import GameLevel from './GameLevel';
+import Timer from './Timer';
 
-export type GameFileInfo = {
+export interface GameFileInfo {
   filePath: string;
   fileUrl: string;
+}
+
+export interface PannelClientRect {
+  width: number;
+  height: number;
+  top: number;
 }
 
 function PuzzleGame() {
@@ -16,6 +25,11 @@ function PuzzleGame() {
   });
 
   const [isStart, setIsStart] = useState(false);
+
+  const gameSuccess = useGameStore((state) => state.success);
+  const gameSize = useGameStore((state) => state.gameSize);
+
+  const gemePannelRef = useRef<HTMLDivElement>(null);
 
   const updateImageUrl = (imageFileInfo: GameFileInfo) => {
     setImageFileInfo({
@@ -28,23 +42,56 @@ function PuzzleGame() {
     setIsStart(true);
   }
 
+  const restartGame = () => {
+    setIsStart(false);
+  }
+
+  const pannelClientRect = (): PannelClientRect | undefined => {
+    if (gemePannelRef.current) {
+      const { clientWidth, clientHeight, offsetTop } = gemePannelRef.current;
+      return {
+        width: clientWidth,
+        height: clientHeight,
+        top: offsetTop,
+      }
+    }
+  }
+
   return (
     <div className='container'>
-      <div className='gameAction'>
-        <ImageInput
-          filePath={imageFileInfo.filePath}
-          updateImage={updateImageUrl}
-          started
-        />
-        <button
-          className='start'
-          onClick={startGame}
-        >开始</button>
+      <div className='gamenav'>
+        <div className='gameAction'>
+          <ImageInput
+            filePath={imageFileInfo.filePath}
+            updateImage={updateImageUrl}
+            started
+            restartGame={restartGame}
+          />
+          <GameLevel
+            restartGame={restartGame}
+          />
+          <button
+            className={isStart?'start startDisable':'start'}
+            onClick={startGame}
+            disabled={isStart}
+          >开始</button>
+        </div>
+        <div className='gameData'>
+          <span className='gameSuccess'>{gameSuccess ? 'SUCCESS!' : ''}</span>
+          <Timer
+            isStart={isStart}
+            isSuccess={gameSuccess}
+          />
+        </div>
       </div>
-      <div className='gamepannel'>
+
+      <div
+        ref={gemePannelRef}
+        className='gamepannel'>
         {isStart ? <GamePannel
-          gameSize={3}
+          gameSize={gameSize}
           imageUrl={imageFileInfo.fileUrl}
+          pannelClientRect={pannelClientRect()}
         /> : <div />}
       </div>
     </div>

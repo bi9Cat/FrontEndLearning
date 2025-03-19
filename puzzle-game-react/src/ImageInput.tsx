@@ -4,11 +4,12 @@ import { GameFileInfo } from './PuzzleGame';
 
 interface ImageInputProps {
     filePath: string;
-    updateImage: (fileImageInfo: GameFileInfo) => void;
     started: boolean;
+    updateImage: (fileImageInfo: GameFileInfo) => void;
+    restartGame: () => void
 }
 
-const ImageInput = ({ filePath, updateImage, started }: ImageInputProps) => {
+const ImageInput = ({ filePath, updateImage, started, restartGame }: ImageInputProps) => {
 
     const inputFileRef = useRef<HTMLInputElement>(null);
 
@@ -27,8 +28,10 @@ const ImageInput = ({ filePath, updateImage, started }: ImageInputProps) => {
 
             updateImage({
                 filePath: filePath,
-                fileUrl: url
+                fileUrl: url,
             });
+
+            restartGame();
         }
     }
 
