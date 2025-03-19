@@ -8,8 +8,11 @@ type Props = {
 export default function Timer({ isStart, isSuccess }: Props) {
     const [seconds, setSeconds] = useState(0);
 
-    let interval: NodeJS.Timeout | null;
+    // console.log(new Date().toString());
+    // console.log(seconds);
     useEffect(() => {
+        let interval: NodeJS.Timeout | null;
+        console.log('xxxxx');
         if (!isStart && !isSuccess) {
             setSeconds(0);
         }
@@ -17,19 +20,17 @@ export default function Timer({ isStart, isSuccess }: Props) {
             interval = setInterval(() => {
                 setSeconds(s => s + 1);
             }, 1000);
-        } else {
-            clearInterval(interval as NodeJS.Timeout);
         }
         return () => {
             if (interval) {
                 clearInterval(interval);
             }
         }
-    }, [seconds, isStart]);
+    }, [isStart, isSuccess]);
 
     return (
         <div>
-            <span>已用时 </span>
+            <span>已用时{seconds} </span>
             <span>{Math.floor(seconds / 3600)}小时</span>
             <span>{Math.floor(seconds / 60) % 60}分钟</span>
             <span>{seconds % 60}秒</span>
