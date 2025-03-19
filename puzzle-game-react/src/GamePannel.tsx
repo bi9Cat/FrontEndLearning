@@ -54,7 +54,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
         // 每次都判断性能有问题，可以只在mouseup回调的时候判断下
         if (isSuccess(newPositionList)) {
             console.log("SUCCESS");
-            setSuccess();
+            setSuccess(true);
         }
         setImageSlicePositions(newPositionList);
     }

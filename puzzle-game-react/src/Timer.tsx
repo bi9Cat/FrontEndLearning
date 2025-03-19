@@ -8,16 +8,16 @@ type Props = {
 export default function Timer({ isStart, isSuccess }: Props) {
     const [seconds, setSeconds] = useState(0);
 
-    console.log(isStart);
     let interval: NodeJS.Timeout | null;
     useEffect(() => {
+        if (!isStart && !isSuccess) {
+            setSeconds(0);
+        }
         if (isStart && !isSuccess) {
-            console.log('sssss');
             interval = setInterval(() => {
                 setSeconds(s => s + 1);
             }, 1000);
         } else {
-            setSeconds(0);
             clearInterval(interval as NodeJS.Timeout);
         }
         return () => {

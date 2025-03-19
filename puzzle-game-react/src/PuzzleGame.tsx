@@ -5,6 +5,7 @@ import './puzzlegame.css';
 import { useGameStore } from './GameStore';
 import GameLevel from './GameLevel';
 import Timer from './Timer';
+import { start } from 'repl';
 
 export interface GameFileInfo {
   filePath: string;
@@ -28,6 +29,7 @@ function PuzzleGame() {
 
   const gameSuccess = useGameStore((state) => state.success);
   const gameSize = useGameStore((state) => state.gameSize);
+  const setSuccess = useGameStore((state) => (state.setSuccess));
 
   const gemePannelRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +46,7 @@ function PuzzleGame() {
 
   const restartGame = () => {
     setIsStart(false);
+    setSuccess(false);
   }
 
   const pannelClientRect = (): PannelClientRect | undefined => {
@@ -71,13 +74,13 @@ function PuzzleGame() {
             restartGame={restartGame}
           />
           <button
-            className={isStart?'start startDisable':'start'}
+            className={isStart ? 'start startDisable' : 'start'}
             onClick={startGame}
             disabled={isStart}
           >开始</button>
         </div>
         <div className='gameData'>
-          <span className='gameSuccess'>{gameSuccess ? 'SUCCESS!' : ''}</span>
+          <span className='gameSuccess'>{gameSuccess && isStart ? 'SUCCESS!' : ''}</span>
           <Timer
             isStart={isStart}
             isSuccess={gameSuccess}
