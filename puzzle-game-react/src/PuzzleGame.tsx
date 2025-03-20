@@ -26,7 +26,6 @@ function PuzzleGame() {
   });
 
   const [isStart, setIsStart] = useState(false);
-
   const gameSuccess = useGameStore((state) => state.success);
   const gameSize = useGameStore((state) => state.gameSize);
   const setSuccess = useGameStore((state) => (state.setSuccess));
@@ -66,8 +65,8 @@ function PuzzleGame() {
         <div className='gameAction'>
           <ImageInput
             filePath={imageFileInfo.filePath}
+            started={isStart}
             updateImage={updateImageUrl}
-            started
             restartGame={restartGame}
           />
           <GameLevel
@@ -81,10 +80,9 @@ function PuzzleGame() {
         </div>
         <div className='gameData'>
           <span className='gameSuccess'>{gameSuccess && isStart ? 'SUCCESS!' : ''}</span>
-          <Timer
-            isStart={isStart}
+          {isStart?<Timer
             isSuccess={gameSuccess}
-          />
+          />:<div/>}
         </div>
       </div>
 

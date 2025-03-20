@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import ImageSlice from "./ImageSlice";
 import { useGameStore } from "./GameStore";
