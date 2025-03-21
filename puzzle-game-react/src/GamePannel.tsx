@@ -47,7 +47,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
         const initImageSlicePositions: ImgPosition[] = Array.from({ length: gameSize * gameSize }, (_, index) => ({
             id: index,
             positionX: Math.floor(Math.random() * maxX),
-            positionY:  Math.floor(Math.random() * maxY),
+            positionY: Math.floor(Math.random() * maxY),
         }));
         return initImageSlicePositions;
     }
@@ -210,7 +210,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
 
     const imageSlices = imageSlicePositions.map((p, index) => {
         const zIndex = draggingImg && draggingImg.id === index ? gameSize * gameSize : index;
-        return <div style={{ zIndex: zIndex ,position:'absolute'}}><ImageSlice
+        return <div style={{ zIndex: zIndex, position: 'absolute' }}><ImageSlice
             key={index}
             sliceInfo={{
                 id: index,
