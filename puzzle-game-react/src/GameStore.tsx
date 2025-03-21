@@ -10,6 +10,7 @@ interface GameStatus {
 export const useGameStore = create<GameStatus>((set) => ({
     success: false,
     setSuccess: (success) => set((state) => ({ success: success })),
+    
     gameSize: 3,
     setGameSize: (size) => set((state) => ({ gameSize: size })),
 }))

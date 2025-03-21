@@ -15,7 +15,8 @@ const ImageInput = ({ filePath, updateImage, started, restartGame }: ImageInputP
 
     const handleUploadBtnClick = () => {
         if (inputFileRef.current) {
-            return inputFileRef.current.click();
+            console.log('xxxxx');
+            inputFileRef.current.click();
         }
     }
 
@@ -45,9 +46,9 @@ const ImageInput = ({ filePath, updateImage, started, restartGame }: ImageInputP
             >
             </input>
             <button
-                className="imageSelect"
+                className={"imageSelect"}
                 onClick={handleUploadBtnClick}
-                disabled={!started}
+                //disabled={started}
             >选择图片
             </button>
             <input ref={inputFileRef}

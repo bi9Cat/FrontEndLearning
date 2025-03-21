@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import ImageSlice from "./ImageSlice";
 import { useGameStore } from "./GameStore";
@@ -10,16 +10,28 @@ interface GamePannelProps {
     pannelClientRect: PannelClientRect | undefined;
 }
 
+// 图片位置
 export interface ImgPosition {
     id: number;
     positionX: number;
     positionY: number;
 }
 
+// 鼠标选中的图片
+export interface DraggingImg {
+    id: number;
+    startPositionX: number; // 点击时点击位置与图片左上角的偏移量
+    startPositionY: number;
+}
+
 const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) => {
 
     const piecesSize = 100;
 
+    /**
+     * 初始化所有的图片的位置，根据面板的宽高生成随机位置，确保生成的图片位置不会超出区域
+     * @returns 
+     */
     const initImageSlicePositions = () => {
         if (!pannelClientRect) {
             return [];
@@ -37,8 +49,23 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
 
     const setSuccess = useGameStore((state) => (state.setSuccess));
 
-    const [imageSlicePositions, setImageSlicePositions] = useState(initImageSlicePositions());
+    const [imageSlicePositions, setImageSlicePositions] = useState(initImageSlicePositions()); // 所有图片信息
+    const [draggingImg, setDraggingImg] = useState<DraggingImg | null>(null);  // 鼠标点击图片信息
 
+    /**
+     * 处理鼠标移动事件，鼠标移动时更新选中图片的位置信息
+     * @param event 
+     */
+    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+        console.log('moving');
+        if (draggingImg) {
+            const newX = event.clientX - draggingImg.startPositionX;
+            const newY = event.clientY - draggingImg.startPositionY;
+            handleMoveImageSlice(draggingImg.id, newX, newY);
+        }
+    }
+
+    // 更新位置信息并判断游戏是否结束
     const handleMoveImageSlice = (id: number, newPositionX: number, newPositionY: number) => {
         const newPositionList = imageSlicePositions.map((position) => {
             if (position.id === id) {
@@ -59,6 +86,28 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
         setImageSlicePositions(newPositionList);
     }
 
+    /**
+     * 鼠标按下或抬起时更新 被选中图片信息
+     * @param draggingImg 
+     */
+    const handleDraggingImg = (draggingImg: DraggingImg | null) => {
+        if (draggingImg) {
+            const { id, startPositionX, startPositionY } = draggingImg;
+            setDraggingImg({
+                id: id,
+                startPositionX: startPositionX,
+                startPositionY: startPositionY,
+            });
+        } else {
+            setDraggingImg(null);
+        }
+    }
+
+    /**
+     * 判断游戏是否成功
+     * @param newPositionList 更新后的图片位置
+     * @returns 游戏是否成功结果
+     */
     const isSuccess = (newPositionList: Array<ImgPosition>): boolean => {
         if (isRightGrid(newPositionList)) {
             return isRightOrder(newPositionList);
@@ -103,12 +152,16 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
             gameSize={gameSize}
             piecesSize={piecesSize}
             onUpdate={handleMoveImageSlice}
+            onDragging={handleDraggingImg}
             imageSlicePositions={imageSlicePositions}
+            isDragging={draggingImg ? draggingImg.id === index : false}
         />
     });
 
     return (
-        <div>
+        <div
+            className='gamepannel'
+            onMouseMove={handleMouseMove}>
             {imageSlices}
         </div>
     );

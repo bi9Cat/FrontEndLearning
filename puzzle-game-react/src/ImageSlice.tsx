@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
 import './puzzlegame.css';
 import { ImgPosition } from "./GamePannel";
+import { DraggingImg } from "./GamePannel";
 
 interface ImageSliceProps {
     id: number;
     imageUrl: string;
     gameSize: number;
     piecesSize: number;
-    imageSlicePositions: Array<ImgPosition>
+    imageSlicePositions: Array<ImgPosition>;
+    isDragging: boolean;
 
     onUpdate: (id: number, newPositionX: number, newPositionY: number) => void
+    onDragging: (draggingImg: DraggingImg | null) => void;
 }
 
 interface NeedClingResult {
@@ -17,16 +20,17 @@ interface NeedClingResult {
     dir: string;
 }
 
-const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePositions, ...rest }: ImageSliceProps) => {
-
-    const [isDragging, setIsDragging] = useState(false); // 用来标记是否被选中
-    const startPosition = useRef({ startPositionX: 0, startPositionY: 0 }); // 点击时点击位置与图片左上角的偏移量
+const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, imageSlicePositions, isDragging, onUpdate, onDragging, ...rest }: ImageSliceProps) => {
 
     const imgPosition = (): ImgPosition | undefined => {
         const currentImgPosition: ImgPosition | undefined = imageSlicePositions.find(p => p.id === id);
         return currentImgPosition;
     }
 
+    /**
+     * 初始化图片切片样式
+     * @returns 样式
+     */
     const initStyle = () => {
         const currentImgPsotion = imgPosition();
         let i = Math.floor(id / gameSize);
@@ -41,29 +45,31 @@ const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePo
         return imageStyle;
     }
 
+    /**
+     * 处理鼠标点击事件，计算出鼠标点击位置与当前图片位置的偏移量，并调父组件方法更新状态 设置当前图片为选中图片
+     * @param event 鼠标点击事件
+     * @returns 
+     */
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
         const currentImgPsotion = imgPosition();
         if (!currentImgPsotion) {
             return;
         }
-        startPosition.current = {
+        onDragging({
+            id: id,
             startPositionX: event.clientX - currentImgPsotion.positionX,
-            startPositionY: event.clientY - currentImgPsotion.positionY
-        };
-        setIsDragging(true);
+            startPositionY: event.clientY - currentImgPsotion.positionY,
+        });
     }
 
-    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (isDragging) {
-            const newX = event.clientX - startPosition.current.startPositionX;
-            const newY = event.clientY - startPosition.current.startPositionY;
-            onUpdate(id, newX, newY);
-        }
-    }
-
+    /**
+     * 处理鼠标抬起事件，
+     * 1.判断是否需要吸附并执行吸附
+     * 2.调父组件方法清除被选中图片状态
+     */
     const handleMouseUp = () => {
         doClingImg();
-        setIsDragging(false);
+        onDragging(null);
     }
 
     const doClingImg = () => {
@@ -140,10 +146,9 @@ const ImageSlice = ({ imageUrl, id, gameSize, piecesSize, onUpdate, imageSlicePo
     return (
         <div
             key={id}
-            className={`image-piece ${isDragging ? 'selectImage' : ''}`}
+            className={`image-piece ${isDragging ? 'image-piece' : ''}`}
             style={initStyle()}
             onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         ></div>
     );
