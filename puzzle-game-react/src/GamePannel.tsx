@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ImageSlice from "./ImageSlice";
 import { useGameStore } from "./GameStore";
@@ -30,6 +30,7 @@ export interface NeedClingResult {
 }
 const piecesSize = 100;
 const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) => {
+
     /**
      * 初始化所有的图片的位置，根据面板的宽高生成随机位置，确保生成的图片位置不会超出区域
      * @returns 
@@ -53,6 +54,14 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
 
     const [imageSlicePositions, setImageSlicePositions] = useState<Array<ImgPosition>>(() => initImageSlicePositions()); // 所有图片信息
     const [draggingImg, setDraggingImg] = useState<DraggingImg | null>(null);  // 鼠标点击图片信息
+
+    useEffect(() => {
+        console.log('handleSuccess');
+        if (isSuccess(imageSlicePositions)) {
+            console.log("SUCCESS");
+            setSuccess(true);
+        }
+    }, [imageSlicePositions]);
 
     /**
      * 处理鼠标移动事件，鼠标移动时更新选中图片的位置信息
@@ -219,9 +228,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
             gameSize={gameSize}
             onUpdate={handleMoveImageSlice}
             onDragging={handleDraggingImg}
-            isDragging={draggingImg ? draggingImg.id === index : false}
             needClingHere={needClingHere}
-            handleSuccess={handleSuccess}
         />
     });
 

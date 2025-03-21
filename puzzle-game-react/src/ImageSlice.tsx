@@ -5,11 +5,9 @@ import { DraggingImg, ImgPosition, NeedClingResult } from "./GamePannel";
 interface ImageSliceProps {
     sliceInfo: ScliceInfo
     gameSize: number;
-    isDragging: boolean;
     onUpdate: (id: number, newPositionX: number, newPositionY: number) => Array<ImgPosition>
     onDragging: (draggingImg: DraggingImg | null) => void;
     needClingHere: () => NeedClingResult | null;
-    handleSuccess: (newPositionList: Array<ImgPosition>) => void;
 }
 
 interface ScliceInfo {
@@ -20,13 +18,14 @@ interface ScliceInfo {
     positionY: number;
 }
 
-const ImageSlice = ({ sliceInfo, gameSize, isDragging, onUpdate, onDragging, needClingHere, handleSuccess, ...rest }: ImageSliceProps) => {
+const ImageSlice = ({ sliceInfo, gameSize, onUpdate, onDragging, needClingHere, ...rest }: ImageSliceProps) => {
 
     /**
      * 初始化图片切片样式
      * @returns 样式
      */
 
+    const imageSliceRef = useRef<HTMLDivElement>(null);
     const { id, imageUrl, piecesSize, positionX, positionY } = sliceInfo;
     const initStyle = useMemo(() => {
         let i = Math.floor(id / gameSize);
@@ -39,10 +38,10 @@ const ImageSlice = ({ sliceInfo, gameSize, isDragging, onUpdate, onDragging, nee
             backgroundPosition: `-${j * piecesSize}px -${i * piecesSize}px`,
             left: `${positionX}px`,
             top: `${positionY}px`,
-            zIndex: `${isDragging ? gameSize * gameSize + 1 : id}`,
+            //zIndex: `${isDragging ? gameSize * gameSize + 1 : id}`,
         }
         return imageStyle;
-    }, [id, imageUrl, piecesSize, positionX, positionY, gameSize, isDragging]);
+    }, [id, imageUrl, piecesSize, positionX, positionY, gameSize]);
 
     /**
      * 处理鼠标点击事件，计算出鼠标点击位置与当前图片位置的偏移量，并调父组件方法更新状态 设置当前图片为选中图片
@@ -59,6 +58,9 @@ const ImageSlice = ({ sliceInfo, gameSize, isDragging, onUpdate, onDragging, nee
             startPositionX: event.clientX - positionX,
             startPositionY: event.clientY - positionY,
         });
+        if (imageSliceRef.current) {
+            imageSliceRef.current.style.zIndex = (gameSize * gameSize + 1).toString();
+        }
     }
 
     /**
@@ -69,6 +71,10 @@ const ImageSlice = ({ sliceInfo, gameSize, isDragging, onUpdate, onDragging, nee
     const handleMouseUp = () => {
         doClingImg();
         onDragging(null);
+        const { id } = sliceInfo;
+        if (imageSliceRef.current) {
+            imageSliceRef.current.style.zIndex = id.toString();
+        }
     }
 
     const doClingImg = () => {
@@ -77,19 +83,20 @@ const ImageSlice = ({ sliceInfo, gameSize, isDragging, onUpdate, onDragging, nee
             const { dir, clingImage } = clingResult;
             const { id, piecesSize } = sliceInfo;
             if (dir === 'D') {
-                handleSuccess(onUpdate(id, clingImage.positionX + piecesSize + 2, clingImage.positionY));
+                (onUpdate(id, clingImage.positionX + piecesSize + 2, clingImage.positionY));
             } else if (dir === 'A') {
-                handleSuccess(onUpdate(id, clingImage.positionX - piecesSize - 2, clingImage.positionY));
+                (onUpdate(id, clingImage.positionX - piecesSize - 2, clingImage.positionY));
             } else if (dir === 'W') {
-                handleSuccess(onUpdate(id, clingImage.positionX, clingImage.positionY - piecesSize - 2));
+                (onUpdate(id, clingImage.positionX, clingImage.positionY - piecesSize - 2));
             } else if (dir === 'S') {
-                handleSuccess(onUpdate(id, clingImage.positionX, clingImage.positionY + piecesSize + 2));
+                (onUpdate(id, clingImage.positionX, clingImage.positionY + piecesSize + 2));
             }
         }
     }
 
     return (
         <div
+            ref={imageSliceRef}
             key={sliceInfo.id}
             className='image-piece'
             style={initStyle}
