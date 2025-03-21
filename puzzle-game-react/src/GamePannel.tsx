@@ -24,10 +24,12 @@ export interface DraggingImg {
     startPositionY: number;
 }
 
+export interface NeedClingResult {
+    clingImage: ImgPosition;
+    dir: string;
+}
+const piecesSize = 100;
 const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) => {
-
-    const piecesSize = 100;
-
     /**
      * 初始化所有的图片的位置，根据面板的宽高生成随机位置，确保生成的图片位置不会超出区域
      * @returns 
@@ -49,7 +51,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
 
     const setSuccess = useGameStore((state) => (state.setSuccess));
 
-    const [imageSlicePositions, setImageSlicePositions] = useState(initImageSlicePositions()); // 所有图片信息
+    const [imageSlicePositions, setImageSlicePositions] = useState<Array<ImgPosition>>(() => initImageSlicePositions()); // 所有图片信息
     const [draggingImg, setDraggingImg] = useState<DraggingImg | null>(null);  // 鼠标点击图片信息
 
     /**
@@ -57,7 +59,6 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
      * @param event 
      */
     const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        console.log('moving');
         if (draggingImg) {
             const newX = event.clientX - draggingImg.startPositionX;
             const newY = event.clientY - draggingImg.startPositionY;
@@ -66,7 +67,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
     }
 
     // 更新位置信息并判断游戏是否结束
-    const handleMoveImageSlice = (id: number, newPositionX: number, newPositionY: number) => {
+    const handleMoveImageSlice = (id: number, newPositionX: number, newPositionY: number): Array<ImgPosition> => {
         const newPositionList = imageSlicePositions.map((position) => {
             if (position.id === id) {
                 return {
@@ -77,13 +78,8 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
             }
             return position;
         });
-
-        // 每次都判断性能有问题，可以只在mouseup回调的时候判断下
-        if (isSuccess(newPositionList)) {
-            console.log("SUCCESS");
-            setSuccess(true);
-        }
         setImageSlicePositions(newPositionList);
+        return newPositionList;
     }
 
     /**
@@ -144,17 +140,88 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
         return true;
     }
 
-    const imageSlices = imageSlicePositions.map((_, index) => {
+    const needClingHere = (): NeedClingResult | null => {
+        if (!draggingImg) {
+            return null;
+        }
+        const draggingImgPositon = imageSlicePositions.find(i => i.id === draggingImg.id);
+        if (!draggingImgPositon) {
+            return null;
+        }
+        const centerX = draggingImgPositon.positionX + piecesSize / 2;
+        const centerY = draggingImgPositon.positionY + piecesSize / 2;
+
+        let clingImage: ImgPosition | undefined;
+        let minDistance = Number.MAX_SAFE_INTEGER;
+        imageSlicePositions.forEach(imgPosition => {
+            if (imgPosition.id !== draggingImgPositon.id) {
+                const imgPositionCenterX = imgPosition.positionX + piecesSize / 2;
+                const imgPositionCenterY = imgPosition.positionY + piecesSize / 2;
+
+                const dx = Math.abs(centerX - imgPositionCenterX);
+                const dy = Math.abs(centerY - imgPositionCenterY);
+
+                if (dx <= (piecesSize + 50) && dy <= (piecesSize + 50)) {
+                    const distance = calculateDistance(centerX, centerY, imgPositionCenterX, imgPositionCenterY);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        clingImage = imgPosition;
+                    }
+                }
+            }
+        });
+
+        if (!clingImage) {
+            return null;
+        }
+
+        const imgPositionCenterX = clingImage.positionX + piecesSize / 2;
+        const imgPositionCenterY = clingImage.positionY + piecesSize / 2;
+
+        const dx = Math.abs(centerX - imgPositionCenterX);
+        const dy = Math.abs(centerY - imgPositionCenterY);
+        let dir;
+        if (dx > dy) {
+            dir = centerX < imgPositionCenterX ? "A" : "D";
+        } else {
+            dir = centerY < imgPositionCenterY ? "W" : "S";
+        }
+
+        return {
+            clingImage: clingImage,
+            dir: dir
+        };
+    }
+
+    const calculateDistance = (x1: number, y1: number, x2: number, y2: number) => {
+        return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
+    }
+
+
+    const handleSuccess = (newPositionList: Array<ImgPosition>) => {
+        console.log('handleSuccess');
+        if (isSuccess(newPositionList)) {
+            console.log("SUCCESS");
+            setSuccess(true);
+        }
+    }
+
+    const imageSlices = imageSlicePositions.map((p, index) => {
         return <ImageSlice
             key={index}
-            id={index}
-            imageUrl={imageUrl}
+            sliceInfo={{
+                id: index,
+                imageUrl: imageUrl,
+                piecesSize: piecesSize,
+                positionX: p.positionX,
+                positionY: p.positionY,
+            }}
             gameSize={gameSize}
-            piecesSize={piecesSize}
             onUpdate={handleMoveImageSlice}
             onDragging={handleDraggingImg}
-            imageSlicePositions={imageSlicePositions}
             isDragging={draggingImg ? draggingImg.id === index : false}
+            needClingHere={needClingHere}
+            handleSuccess={handleSuccess}
         />
     });
 
