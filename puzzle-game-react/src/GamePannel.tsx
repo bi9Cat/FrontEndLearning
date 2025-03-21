@@ -35,6 +35,8 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
      * 初始化所有的图片的位置，根据面板的宽高生成随机位置，确保生成的图片位置不会超出区域
      * @returns 
      */
+
+    console.log(pannelClientRect);
     const initImageSlicePositions = () => {
         if (!pannelClientRect) {
             return [];
@@ -45,7 +47,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
         const initImageSlicePositions: ImgPosition[] = Array.from({ length: gameSize * gameSize }, (_, index) => ({
             id: index,
             positionX: Math.floor(Math.random() * maxX),
-            positionY: top + Math.floor(Math.random() * maxY),
+            positionY:  Math.floor(Math.random() * maxY),
         }));
         return initImageSlicePositions;
     }
@@ -206,17 +208,9 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
         return Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
     }
 
-
-    const handleSuccess = (newPositionList: Array<ImgPosition>) => {
-        console.log('handleSuccess');
-        if (isSuccess(newPositionList)) {
-            console.log("SUCCESS");
-            setSuccess(true);
-        }
-    }
-
     const imageSlices = imageSlicePositions.map((p, index) => {
-        return <ImageSlice
+        const zIndex = draggingImg && draggingImg.id === index ? gameSize * gameSize : index;
+        return <div style={{ zIndex: zIndex ,position:'absolute'}}><ImageSlice
             key={index}
             sliceInfo={{
                 id: index,
@@ -229,7 +223,7 @@ const GamePannel = ({ imageUrl, gameSize, pannelClientRect }: GamePannelProps) =
             onUpdate={handleMoveImageSlice}
             onDragging={handleDraggingImg}
             needClingHere={needClingHere}
-        />
+        /></div>
     });
 
     return (

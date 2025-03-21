@@ -25,20 +25,17 @@ const ImageSlice = ({ sliceInfo, gameSize, onUpdate, onDragging, needClingHere, 
      * @returns 样式
      */
 
-    const imageSliceRef = useRef<HTMLDivElement>(null);
     const { id, imageUrl, piecesSize, positionX, positionY } = sliceInfo;
     const initStyle = useMemo(() => {
         let i = Math.floor(id / gameSize);
         let j = id % gameSize;
 
-        console.log('initStyle' + id);
         const imageStyle = {
             backgroundSize: `${piecesSize * gameSize}px ${piecesSize * gameSize}px`,
             backgroundImage: `url(${imageUrl})`,
             backgroundPosition: `-${j * piecesSize}px -${i * piecesSize}px`,
             left: `${positionX}px`,
             top: `${positionY}px`,
-            //zIndex: `${isDragging ? gameSize * gameSize + 1 : id}`,
         }
         return imageStyle;
     }, [id, imageUrl, piecesSize, positionX, positionY, gameSize]);
@@ -58,9 +55,6 @@ const ImageSlice = ({ sliceInfo, gameSize, onUpdate, onDragging, needClingHere, 
             startPositionX: event.clientX - positionX,
             startPositionY: event.clientY - positionY,
         });
-        if (imageSliceRef.current) {
-            imageSliceRef.current.style.zIndex = (gameSize * gameSize + 1).toString();
-        }
     }
 
     /**
@@ -71,10 +65,6 @@ const ImageSlice = ({ sliceInfo, gameSize, onUpdate, onDragging, needClingHere, 
     const handleMouseUp = () => {
         doClingImg();
         onDragging(null);
-        const { id } = sliceInfo;
-        if (imageSliceRef.current) {
-            imageSliceRef.current.style.zIndex = id.toString();
-        }
     }
 
     const doClingImg = () => {
@@ -96,7 +86,6 @@ const ImageSlice = ({ sliceInfo, gameSize, onUpdate, onDragging, needClingHere, 
 
     return (
         <div
-            ref={imageSliceRef}
             key={sliceInfo.id}
             className='image-piece'
             style={initStyle}

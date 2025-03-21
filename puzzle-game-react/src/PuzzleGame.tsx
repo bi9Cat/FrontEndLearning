@@ -88,7 +88,7 @@ function PuzzleGame() {
 
       <div
         ref={gemePannelRef}
-        className='gamepannel'>
+        style={{width:"100%",height:"100%"}}>
         {isStart ? <GamePannel
           gameSize={gameSize}
           imageUrl={imageFileInfo.fileUrl}
